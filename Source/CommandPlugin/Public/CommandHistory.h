@@ -5,7 +5,10 @@
 #include "Command.h"
 #include "CommandHistory.generated.h"
 
-//TODO: MaxSize
+/*
+	Commands Enter the history by Push()
+	Commands Exit the history by MaxSize check or Clear() -> Destroyed
+*/
 
 UCLASS(BlueprintType)
 class COMMANDPLUGIN_API UCommandHistory : public UObject
@@ -58,8 +61,18 @@ public:
 	void Clear();
 
 private:
+	/* Unvalidated logic for performing undo*/
+	void UndoLatest();
+
+	/* Unvalidated logic for performing redo*/
+	void RedoLatest();
+
+	/* Clear Undoable and Destroy command */
 	void ClearUndoable();
+
+	/* Clear Redoable and Destroy command */
 	void ClearRedoable();
 
+	/* Call when command exits history */
 	void DestroyCommand(TScriptInterface<ICommand> Command);
 };

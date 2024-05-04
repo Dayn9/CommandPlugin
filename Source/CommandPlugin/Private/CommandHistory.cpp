@@ -3,21 +3,27 @@
 void UCommandHistory::Push(TScriptInterface<ICommand> Command)
 {
 	/* perform null checks here, this is the only entry point for commands into the history */
-	if (&Command == NULL) return; 
+	if (&Command == NULL) 
+		return; 
 
 	UObject* CommandObject = Command.GetObject();
-	if (CommandObject == NULL) return;
+	if (CommandObject == NULL) 
+		return;
 
-	if (UndoableHistory.Num() == MaxSize) {
-		DestroyCommand(UndoableHistory[0]);
-		UndoableHistory.RemoveAt(0);
+	if (ICommand::Execute_Do(CommandObject)) 
+	{
+		if (UndoableHistory.Num() == MaxSize)
+		{
+			DestroyCommand(UndoableHistory[0]); // when max size, destroy 'oldest'
+			UndoableHistory.RemoveAt(0);
+		}
+		UndoableHistory.Push(Command);
+
+		ClearRedoable(); // no branching history
 	}
-
-	ICommand::Execute_Do(CommandObject);
-	UndoableHistory.Push(Command);
-
-	ClearRedoable(); // no branching history
 }
+
+#pragma region UNDO 
 
 bool UCommandHistory::CanUndo()
 {
@@ -26,30 +32,32 @@ bool UCommandHistory::CanUndo()
 
 void UCommandHistory::Undo()
 {
-	if (!CanUndo()) return;
-
-	// pop -> push
-	TScriptInterface<ICommand> Command = UndoableHistory.Pop(true); 
-	ICommand::Execute_Undo(Command.GetObject());
-	RedoableHistory.Push(Command);
+	if (CanUndo()) 
+		UndoLatest();
 }
 
 void UCommandHistory::UndoNum(int num)
 {
+	num = FMath::Clamp(num, 0, UndoableHistory.Num());
+	for (size_t i = 0; i < num; ++i)
+		UndoLatest();
 }
 
 void UCommandHistory::UndoAll()
 {
-	if (!CanUndo()) return;
-
-	for (size_t i = UndoableHistory.Num() - 1; i != -1; --i)
-		ICommand::Execute_Undo(UndoableHistory[i].GetObject());
-
-	Algo::Reverse(UndoableHistory);
-	RedoableHistory.Append(UndoableHistory);
-	UndoableHistory.Empty();
-
+	UndoNum(UndoableHistory.Num());
 }
+
+void UCommandHistory::UndoLatest()
+{
+	TScriptInterface<ICommand> Command = UndoableHistory.Pop(true);
+	if (ICommand::Execute_Undo(Command.GetObject()))
+		RedoableHistory.Push(Command);
+}
+
+#pragma endregion
+
+#pragma region REDO
 
 bool UCommandHistory::CanRedo()
 {
@@ -58,16 +66,16 @@ bool UCommandHistory::CanRedo()
 
 void UCommandHistory::Redo()
 {
-	if (!CanRedo()) return;
-
-	// pop -> push
-	TScriptInterface<ICommand> Command = RedoableHistory.Pop(true);
-	ICommand::Execute_Do(Command.GetObject());
-	UndoableHistory.Push(Command);
+	if (CanRedo()) 
+		RedoLatest();
 }
 
 void UCommandHistory::RedoNum(int num)
 {
+	num = FMath::Clamp(num, 0, RedoableHistory.Num());
+	for (size_t i = 0; i < num; ++i)
+		RedoLatest();
+
 }
 
 void UCommandHistory::RedoAll()
@@ -81,6 +89,17 @@ void UCommandHistory::RedoAll()
 	UndoableHistory.Append(RedoableHistory);
 	RedoableHistory.Empty();
 }
+
+void UCommandHistory::RedoLatest()
+{
+	TScriptInterface<ICommand> Command = RedoableHistory.Pop(true);
+	if (ICommand::Execute_Do(Command.GetObject()))
+		UndoableHistory.Push(Command);
+}
+
+#pragma endregion
+
+#pragma region Clear
 
 void UCommandHistory::Clear()
 {
@@ -111,3 +130,5 @@ void UCommandHistory::DestroyCommand(TScriptInterface<ICommand> Command)
 		CommandObject->ConditionalBeginDestroy();
 	}	
 }
+
+#pragma endregion

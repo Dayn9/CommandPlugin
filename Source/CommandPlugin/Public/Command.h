@@ -24,12 +24,11 @@ class COMMANDPLUGIN_API ICommand
 	GENERATED_BODY()
 
 public:
+	/* changes state to new value. Returns true when state is changed */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Command")
+	bool Do();
 
-	/* changes state to new value */
-	UFUNCTION(BlueprintNativeEvent, Category = "Command")
-	void Do();
-
-	/* restores state to old value */
-	UFUNCTION(BlueprintNativeEvent, Category = "Command")
-	void Undo();
+	/* restores state to old value. Returns true when state is changed */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Command")
+	bool Undo();
 };
