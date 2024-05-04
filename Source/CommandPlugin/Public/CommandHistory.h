@@ -7,16 +7,22 @@
 
 //TODO: MaxSize
 
-UCLASS()
+UCLASS(BlueprintType)
 class COMMANDPLUGIN_API UCommandHistory : public UObject
 {
 	GENERATED_BODY()
-private:
 
+private:
+	UPROPERTY(BlueprintGetter = GetMaxSize, meta = (ExposeOnSpawn = true))
+	int MaxSize = 100;
 	TArray<TScriptInterface<ICommand>> UndoableHistory = TArray<TScriptInterface<ICommand>>();
 	TArray<TScriptInterface<ICommand>> RedoableHistory = TArray<TScriptInterface<ICommand>>();
 
 public:
+
+	UFUNCTION(BlueprintGetter, BlueprintPure)
+	inline int GetMaxSize() const { return MaxSize; }
+
 	/* execute and track command in history*/
 	UFUNCTION(BlueprintCallable, Category = "Command | History")
 	void Push(TScriptInterface<ICommand> Command);
@@ -54,5 +60,6 @@ public:
 private:
 	void ClearUndoable();
 	void ClearRedoable();
-	void ClearCommand(TScriptInterface<ICommand> Command);
+
+	void DestroyCommand(TScriptInterface<ICommand> Command);
 };

@@ -8,6 +8,11 @@ void UCommandHistory::Push(TScriptInterface<ICommand> Command)
 	UObject* CommandObject = Command.GetObject();
 	if (CommandObject == NULL) return;
 
+	if (UndoableHistory.Num() == MaxSize) {
+		DestroyCommand(UndoableHistory[0]);
+		UndoableHistory.RemoveAt(0);
+	}
+
 	ICommand::Execute_Do(CommandObject);
 	UndoableHistory.Push(Command);
 
@@ -86,7 +91,7 @@ void UCommandHistory::Clear()
 void UCommandHistory::ClearUndoable()
 {
 	for (auto& Command : UndoableHistory)
-		ClearCommand(Command);
+		DestroyCommand(Command);
 
 	UndoableHistory.Empty();
 }
@@ -94,12 +99,12 @@ void UCommandHistory::ClearUndoable()
 void UCommandHistory::ClearRedoable()
 {
 	for (auto& Command : RedoableHistory)
-		ClearCommand(Command);
+		DestroyCommand(Command);
 
 	RedoableHistory.Empty();
 }
 
-void UCommandHistory::ClearCommand(TScriptInterface<ICommand> Command)
+void UCommandHistory::DestroyCommand(TScriptInterface<ICommand> Command)
 {
 	UObject* CommandObject = Command.GetObject();
 	if (CommandObject->IsValidLowLevel()) {
