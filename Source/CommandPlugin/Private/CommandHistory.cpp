@@ -67,10 +67,26 @@ void UCommandHistory::Clear()
 
 void UCommandHistory::ClearUndoable()
 {
+	for (auto& Command : UndoableHistory)
+		ClearCommand(Command);
+
 	UndoableHistory.Empty();
 }
 
 void UCommandHistory::ClearRedoable()
 {
+	for (auto& Command : RedoableHistory)
+		ClearCommand(Command);
+
 	RedoableHistory.Empty();
+}
+
+void UCommandHistory::ClearCommand(TScriptInterface<ICommand> Command)
+{
+	if (&Command == NULL) return;
+
+	UObject* CommandObject = Command.GetObject();
+	if (!CommandObject->IsValidLowLevel()) return;
+
+	CommandObject->ConditionalBeginDestroy();
 }

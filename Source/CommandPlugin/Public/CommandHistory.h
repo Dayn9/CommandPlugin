@@ -54,4 +54,5 @@ public:
 private:
 	void ClearUndoable();
 	void ClearRedoable();
+	void ClearCommand(TScriptInterface<ICommand> Command);
 };
