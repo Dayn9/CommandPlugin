@@ -2,7 +2,8 @@
 
 void UCommandHistory::Push(TScriptInterface<ICommand> Command)
 {
-	if (&Command == NULL) return;
+	/* perform null checks here, this is the only entry point for commands into the history */
+	if (&Command == NULL) return; 
 
 	UObject* CommandObject = Command.GetObject();
 	if (CommandObject == NULL) return;
@@ -34,6 +35,15 @@ void UCommandHistory::UndoNum(int num)
 
 void UCommandHistory::UndoAll()
 {
+	if (!CanUndo()) return;
+
+	for (size_t i = UndoableHistory.Num() - 1; i != -1; --i)
+		ICommand::Execute_Undo(UndoableHistory[i].GetObject());
+
+	Algo::Reverse(UndoableHistory);
+	RedoableHistory.Append(UndoableHistory);
+	UndoableHistory.Empty();
+
 }
 
 bool UCommandHistory::CanRedo()
@@ -57,6 +67,14 @@ void UCommandHistory::RedoNum(int num)
 
 void UCommandHistory::RedoAll()
 {
+	if (!CanRedo()) return;
+
+	for (size_t i = RedoableHistory.Num() - 1; i != -1; --i)
+		ICommand::Execute_Undo(RedoableHistory[i].GetObject());
+
+	Algo::Reverse(RedoableHistory);
+	UndoableHistory.Append(RedoableHistory);
+	RedoableHistory.Empty();
 }
 
 void UCommandHistory::Clear()
@@ -83,10 +101,8 @@ void UCommandHistory::ClearRedoable()
 
 void UCommandHistory::ClearCommand(TScriptInterface<ICommand> Command)
 {
-	if (&Command == NULL) return;
-
 	UObject* CommandObject = Command.GetObject();
-	if (!CommandObject->IsValidLowLevel()) return;
-
-	CommandObject->ConditionalBeginDestroy();
+	if (CommandObject->IsValidLowLevel()) {
+		CommandObject->ConditionalBeginDestroy();
+	}	
 }
