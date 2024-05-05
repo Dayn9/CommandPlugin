@@ -31,4 +31,8 @@ public:
 	/* restores state to old value. Returns true when state is changed */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Command")
 	bool Undo();
+
+	/* get a user display string for this command */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Command")
+	FString GetDisplayString();
 };
