@@ -1,4 +1,5 @@
 #include "CommandHistory.h"
+#include "CommandUtil.h"
 
 void UCommandHistory::Push(TScriptInterface<ICommand> Command)
 {
@@ -14,7 +15,7 @@ void UCommandHistory::Push(TScriptInterface<ICommand> Command)
 	{
 		if (UndoableHistory.Num() == MaxSize)
 		{
-			DestroyCommand(UndoableHistory[0]); // when max size, destroy 'oldest'
+			CommandUtil::DestroyCommand(UndoableHistory[0]); // when max size, destroy 'oldest'
 			UndoableHistory.RemoveAt(0);
 		}
 		UndoableHistory.Push(Command);
@@ -110,7 +111,7 @@ void UCommandHistory::Clear()
 void UCommandHistory::ClearUndoable()
 {
 	for (auto& Command : UndoableHistory)
-		DestroyCommand(Command);
+		CommandUtil::DestroyCommand(Command);
 
 	UndoableHistory.Empty();
 }
@@ -118,17 +119,9 @@ void UCommandHistory::ClearUndoable()
 void UCommandHistory::ClearRedoable()
 {
 	for (auto& Command : RedoableHistory)
-		DestroyCommand(Command);
+		CommandUtil::DestroyCommand(Command);
 
 	RedoableHistory.Empty();
-}
-
-void UCommandHistory::DestroyCommand(TScriptInterface<ICommand> Command)
-{
-	UObject* CommandObject = Command.GetObject();
-	if (CommandObject->IsValidLowLevel()) {
-		CommandObject->ConditionalBeginDestroy();
-	}	
 }
 
 #pragma endregion

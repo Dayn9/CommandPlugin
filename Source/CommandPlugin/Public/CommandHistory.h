@@ -72,7 +72,4 @@ private:
 
 	/* Clear Redoable and Destroy command */
 	void ClearRedoable();
-
-	/* Call when command exits history */
-	void DestroyCommand(TScriptInterface<ICommand> Command);
 };
