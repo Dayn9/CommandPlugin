@@ -52,8 +52,8 @@ void UCommandHistory::UndoAll()
 void UCommandHistory::UndoLatest()
 {
 	TScriptInterface<ICommand> Command = UndoableHistory.Pop(true);
-	if (ICommand::Execute_Undo(Command.GetObject()))
-		RedoableHistory.Push(Command);
+	ICommand::Execute_Undo(Command.GetObject());
+	RedoableHistory.Push(Command);
 }
 
 #pragma endregion
@@ -94,8 +94,8 @@ void UCommandHistory::RedoAll()
 void UCommandHistory::RedoLatest()
 {
 	TScriptInterface<ICommand> Command = RedoableHistory.Pop(true);
-	if (ICommand::Execute_Do(Command.GetObject()))
-		UndoableHistory.Push(Command);
+	ICommand::Execute_Do(Command.GetObject());
+	UndoableHistory.Push(Command);
 }
 
 #pragma endregion
