@@ -1,6 +1,11 @@
 #include "CommandHistoryExperimental.h"
 #include <CommandUtil.h>
 
+UCommandHistoryExperimental::UCommandHistoryExperimental()
+{
+	History.Init(NULL, MaxSize); // fill array with NULL
+}
+
 void UCommandHistoryExperimental::Push(TScriptInterface<ICommand> Command)
 {
 	/* perform null checks here, this is the only entry point for commands into the history */
@@ -13,16 +18,20 @@ void UCommandHistoryExperimental::Push(TScriptInterface<ICommand> Command)
 
 	if (ICommand::Execute_Do(CommandObject))
 	{
-		/*
-		if (History.Num() == MaxSize)
-		{
-			CommandUtil::DestroyCommand(History[0]); // when max size, destroy 'oldest'
-		}
-		*/
-		ClearRedoable(); // no branching history
+		int NextIndex = CurrentIndex + 1;
 
-		CurrentIndex = History.Add(Command);
-		LastIndex = CurrentIndex;
+		// max size check, replace oldest in array
+		if (NextIndex == MaxSize)
+		{
+			CommandUtil::DestroyCommand(History[TrueIndex(NextIndex)]); 
+			IndexOffset = TrueIndex(1); 
+			NextIndex = MaxSize - 1;
+		}
+
+		ClearRedoable(); // clear redoable, so history does not branch
+
+		History[TrueIndex(NextIndex)] = Command;
+		LastIndex = CurrentIndex = NextIndex;
 	}
 }
 
@@ -36,14 +45,14 @@ bool UCommandHistoryExperimental::CanUndo()
 void UCommandHistoryExperimental::Undo()
 {
 	if (CanUndo())
-		UndoLatest();
+		Undo_Impl();
 }
 
 void UCommandHistoryExperimental::UndoNum(int num)
 {
 	num = FMath::Clamp(num, 0, CurrentIndex + 1);
 	for (size_t i = 0; i < num; ++i)
-		UndoLatest();
+		Undo_Impl();
 }
 
 void UCommandHistoryExperimental::UndoAll()
@@ -51,9 +60,9 @@ void UCommandHistoryExperimental::UndoAll()
 	UndoNum(CurrentIndex + 1);
 }
 
-void UCommandHistoryExperimental::UndoLatest()
+void UCommandHistoryExperimental::Undo_Impl()
 {
-	TScriptInterface<ICommand> Command = History[CurrentIndex];
+	TScriptInterface<ICommand> Command = History[TrueIndex(CurrentIndex)];
 	ICommand::Execute_Undo(Command.GetObject());
 	--CurrentIndex;
 }
@@ -70,14 +79,14 @@ bool UCommandHistoryExperimental::CanRedo()
 void UCommandHistoryExperimental::Redo()
 {
 	if (CanRedo())
-		RedoLatest();
+		Redo_Impl();
 }
 
 void UCommandHistoryExperimental::RedoNum(int num)
 {
 	num = FMath::Clamp(num, 0, LastIndex - CurrentIndex);
 	for (size_t i = 0; i < num; ++i)
-		RedoLatest();
+		Redo_Impl();
 }
 
 void UCommandHistoryExperimental::RedoAll()
@@ -85,10 +94,10 @@ void UCommandHistoryExperimental::RedoAll()
 	RedoNum(LastIndex - CurrentIndex);
 }
 
-void UCommandHistoryExperimental::RedoLatest()
+void UCommandHistoryExperimental::Redo_Impl()
 {
 	++CurrentIndex;
-	TScriptInterface<ICommand> Command = History[CurrentIndex];
+	TScriptInterface<ICommand> Command = History[TrueIndex(CurrentIndex)];
 	ICommand::Execute_Do(Command.GetObject());
 }
 
@@ -100,11 +109,11 @@ void UCommandHistoryExperimental::Clear()
 {
 	// Clear history without re-allocating array
 	for (size_t i = LastIndex; i > 0; --i) 
-		CommandUtil::DestroyCommand(History[i]);
-	History.RemoveAt(0, LastIndex + 1, false);
+		CommandUtil::DestroyCommand(History[TrueIndex(i)]);
 
-	CurrentIndex = 0;
-	LastIndex = 0;
+	History.Init(NULL, MaxSize);
+	LastIndex = CurrentIndex = -1;
+	IndexOffset = 0;
 }
 
 void UCommandHistoryExperimental::ClearRedoable()
@@ -112,8 +121,10 @@ void UCommandHistoryExperimental::ClearRedoable()
 	if (LastIndex == CurrentIndex) return;
 
 	for (size_t i = LastIndex; i > CurrentIndex; --i) 
-		CommandUtil::DestroyCommand(History[i]);
-	History.RemoveAt(CurrentIndex + 1, LastIndex - CurrentIndex, false);
+	{
+		CommandUtil::DestroyCommand(History[TrueIndex(i)]);
+		History[TrueIndex(i)] = NULL;
+	}
 	LastIndex = CurrentIndex;
 }
 
