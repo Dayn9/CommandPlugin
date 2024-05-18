@@ -1,7 +1,12 @@
 #include "CommandHistory.h"
 #include "CommandUtil.h"
 
-void UCommandHistory::Push(TScriptInterface<ICommand> Command)
+int UCommandHistory::GetMaxSize_Implementation()
+{
+	return MaxSize;
+}
+
+void UCommandHistory::Push_Implementation(const TScriptInterface<ICommand>& Command)
 {
 	/* perform null checks here, this is the only entry point for commands into the history */
 	if (&Command == NULL) 
@@ -26,25 +31,25 @@ void UCommandHistory::Push(TScriptInterface<ICommand> Command)
 
 #pragma region UNDO 
 
-bool UCommandHistory::CanUndo()
+bool UCommandHistory::CanUndo_Implementation()
 {
 	return UndoableHistory.Num() > 0;
 }
 
-void UCommandHistory::Undo()
+void UCommandHistory::Undo_Implementation()
 {
 	if (CanUndo()) 
 		UndoLatest();
 }
 
-void UCommandHistory::UndoNum(int num)
+void UCommandHistory::UndoNum_Implementation(int num)
 {
 	num = FMath::Clamp(num, 0, UndoableHistory.Num());
 	for (size_t i = 0; i < num; ++i)
 		UndoLatest();
 }
 
-void UCommandHistory::UndoAll()
+void UCommandHistory::UndoAll_Implementation()
 {
 	UndoNum(UndoableHistory.Num());
 }
@@ -60,18 +65,18 @@ void UCommandHistory::UndoLatest()
 
 #pragma region REDO
 
-bool UCommandHistory::CanRedo()
+bool UCommandHistory::CanRedo_Implementation()
 {
 	return RedoableHistory.Num() > 0;
 }
 
-void UCommandHistory::Redo()
+void UCommandHistory::Redo_Implementation()
 {
 	if (CanRedo()) 
 		RedoLatest();
 }
 
-void UCommandHistory::RedoNum(int num)
+void UCommandHistory::RedoNum_Implementation(int num)
 {
 	num = FMath::Clamp(num, 0, RedoableHistory.Num());
 	for (size_t i = 0; i < num; ++i)
@@ -79,7 +84,7 @@ void UCommandHistory::RedoNum(int num)
 
 }
 
-void UCommandHistory::RedoAll()
+void UCommandHistory::RedoAll_Implementation()
 {
 	if (!CanRedo()) return;
 
@@ -102,7 +107,7 @@ void UCommandHistory::RedoLatest()
 
 #pragma region Clear
 
-void UCommandHistory::Clear()
+void UCommandHistory::Clear_Implementation()
 {
 	ClearUndoable();
 	ClearRedoable();

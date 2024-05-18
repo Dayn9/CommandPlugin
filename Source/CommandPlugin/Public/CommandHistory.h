@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "Command.h"
+#include "CommandStack.h"
 #include "CommandHistory.generated.h"
 
 /*
@@ -11,56 +12,47 @@
 */
 
 UCLASS(BlueprintType)
-class COMMANDPLUGIN_API UCommandHistory : public UObject
+class COMMANDPLUGIN_API UCommandHistory : public UObject, public ICommandStack
 {
 	GENERATED_BODY()
 
-private:
-	UPROPERTY(BlueprintGetter = GetMaxSize, meta = (ExposeOnSpawn = true))
-	int MaxSize = 100;
-	TArray<TScriptInterface<ICommand>> UndoableHistory = TArray<TScriptInterface<ICommand>>();
-	TArray<TScriptInterface<ICommand>> RedoableHistory = TArray<TScriptInterface<ICommand>>();
-
 public:
 
-	UFUNCTION(BlueprintGetter, BlueprintPure)
-	inline int GetMaxSize() const { return MaxSize; }
+	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = true))
+	int MaxSize = 100;
 
-	/* execute and track command in history*/
-	UFUNCTION(BlueprintCallable, Category = "Command | History")
-	void Push(TScriptInterface<ICommand> Command);
+#pragma region  ICommandStack implementation
 
-	/* Returns true when there is history that can be undone */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Command | History")
-	bool CanUndo();
-	/* Undo the most recently done command */
-	UFUNCTION(BlueprintCallable, Category = "Command | History")
-	void Undo();
-	/* Undo a set number of the most recently done commands */
-	UFUNCTION(BlueprintCallable, Category = "Command | History")
-	void UndoNum(int num);
-	/* Undo every command that has been done */
-	UFUNCTION(BlueprintCallable, Category = "Command | History")
-	void UndoAll();
+	int GetMaxSize_Implementation() override;
 
-	/* Returns true when there is history that can be redone */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Command | History")
-	bool CanRedo();
-	/* Redo the most recently undone command */
-	UFUNCTION(BlueprintCallable, Category = "Command | History")
-	void Redo();
-	/* Redo a set number of the most recently undone commands */
-	UFUNCTION(BlueprintCallable, Category = "Command | History")
-	void RedoNum(int num);
-	/* Redo every command that has been undone */
-	UFUNCTION(BlueprintCallable, Category = "Command | History")
-	void RedoAll();
+	void Push_Implementation(const TScriptInterface<ICommand>& Command) override;
 
-	/* Discard all history */
-	UFUNCTION(BlueprintCallable, Category = "Command | History")
-	void Clear();
+	bool CanUndo_Implementation() override;
+
+	void Undo_Implementation() override;
+
+	void UndoNum_Implementation(int num) override;
+
+	void UndoAll_Implementation() override;
+
+	bool CanRedo_Implementation() override;
+
+	void Redo_Implementation() override;
+
+	void RedoNum_Implementation(int num) override;
+
+	void RedoAll_Implementation() override;
+
+	void Clear_Implementation() override;
+
+#pragma endregion
 
 private:
+
+	TArray<TScriptInterface<ICommand>> UndoableHistory = TArray<TScriptInterface<ICommand>>();
+
+	TArray<TScriptInterface<ICommand>> RedoableHistory = TArray<TScriptInterface<ICommand>>();
+
 	/* Unvalidated logic for performing undo*/
 	void UndoLatest();
 

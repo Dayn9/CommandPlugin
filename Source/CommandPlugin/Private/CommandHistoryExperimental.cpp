@@ -6,7 +6,12 @@ UCommandHistoryExperimental::UCommandHistoryExperimental()
 	History.Init(NULL, MaxSize); // fill array with NULL
 }
 
-void UCommandHistoryExperimental::Push(TScriptInterface<ICommand> Command)
+int UCommandHistoryExperimental::GetMaxSize_Implementation()
+{
+	return MaxSize;
+}
+
+void UCommandHistoryExperimental::Push_Implementation(const TScriptInterface<ICommand>& Command)
 {
 	/* perform null checks here, this is the only entry point for commands into the history */
 	if (&Command == NULL)
@@ -37,25 +42,25 @@ void UCommandHistoryExperimental::Push(TScriptInterface<ICommand> Command)
 
 #pragma region UNDO 
 
-bool UCommandHistoryExperimental::CanUndo()
+bool UCommandHistoryExperimental::CanUndo_Implementation()
 {
 	return CurrentIndex > -1;
 }
 
-void UCommandHistoryExperimental::Undo()
+void UCommandHistoryExperimental::Undo_Implementation()
 {
 	if (CanUndo())
 		Undo_Impl();
 }
 
-void UCommandHistoryExperimental::UndoNum(int num)
+void UCommandHistoryExperimental::UndoNum_Implementation(int num)
 {
 	num = FMath::Clamp(num, 0, CurrentIndex + 1);
 	for (size_t i = 0; i < num; ++i)
 		Undo_Impl();
 }
 
-void UCommandHistoryExperimental::UndoAll()
+void UCommandHistoryExperimental::UndoAll_Implementation()
 {
 	UndoNum(CurrentIndex + 1);
 }
@@ -71,25 +76,25 @@ void UCommandHistoryExperimental::Undo_Impl()
 
 #pragma region REDO
 
-bool UCommandHistoryExperimental::CanRedo()
+bool UCommandHistoryExperimental::CanRedo_Implementation()
 {
 	return CurrentIndex != LastIndex;
 }
 
-void UCommandHistoryExperimental::Redo()
+void UCommandHistoryExperimental::Redo_Implementation()
 {
 	if (CanRedo())
 		Redo_Impl();
 }
 
-void UCommandHistoryExperimental::RedoNum(int num)
+void UCommandHistoryExperimental::RedoNum_Implementation(int num)
 {
 	num = FMath::Clamp(num, 0, LastIndex - CurrentIndex);
 	for (size_t i = 0; i < num; ++i)
 		Redo_Impl();
 }
 
-void UCommandHistoryExperimental::RedoAll()
+void UCommandHistoryExperimental::RedoAll_Implementation()
 {
 	RedoNum(LastIndex - CurrentIndex);
 }
@@ -105,7 +110,7 @@ void UCommandHistoryExperimental::Redo_Impl()
 
 #pragma region Clear
 
-void UCommandHistoryExperimental::Clear()
+void UCommandHistoryExperimental::Clear_Implementation()
 {
 	// Clear history without re-allocating array
 	for (size_t i = LastIndex; i > 0; --i) 
