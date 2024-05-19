@@ -7,6 +7,9 @@
 #include "CommandHistory.generated.h"
 
 /*
+	Use this version of command history if you don't expect frequent use and/or expect very few commands
+		- this version dynamically resizes based on the number of commands	
+
 	Commands Enter the history by Push()
 	Commands Exit the history by MaxSize check or Clear() -> Destroyed
 */

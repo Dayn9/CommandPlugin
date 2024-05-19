@@ -1,12 +1,17 @@
-#pragma once
+#pragma onceUCommandHistoryFixedSize
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "Command.h"
 #include "CommandStack.h"
-#include "CommandHistoryExperimental.generated.h"
+#include "CommandHistoryFixedSize.generated.h"
 
 /*
+	Use this version of command history if you need to frequently access the command history
+		- frequently pushing / undoing / redoing
+		- frequently pushing at max size
+		- this version does not resize, and will always allocate the MAX SIZE 
+
 	Linear history of commands that have been done and undone
 
 	Commands Enter the history by Push(), which will call Do
@@ -16,12 +21,12 @@
 	Note: Calling Push() when there are undone commands will clear all undone commands from the history
 */
 UCLASS(BlueprintType)
-class COMMANDPLUGIN_API UCommandHistoryExperimental : public UObject, public ICommandStack
+class COMMANDPLUGIN_API UCommandHistoryFixedSize : public UObject, public ICommandStack
 {
 	GENERATED_BODY()
 
 	/*
-	This implementation was created to avoid Array reallocation, so indicies loop
+	This implementation was created to avoid Array reallocation, so the array index will loop
 
 	Basically treat CurrentIndex and LastIndex like usual where 0 is the first and oldest element
 	When max size is reached, instead of destroying index 0 and shifting the whole array:
@@ -32,7 +37,7 @@ class COMMANDPLUGIN_API UCommandHistoryExperimental : public UObject, public ICo
 	*/
 
 public: 
-	UCommandHistoryExperimental();
+	UCommandHistoryFixedSize();
 
 	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = true))
 	int MaxSize = 100;
