@@ -21,23 +21,22 @@ void UCommandHistoryFixedSize::Push_Implementation(const TScriptInterface<IComma
 	if (CommandObject == NULL)
 		return;
 
-	if (ICommand::Execute_Do(CommandObject))
+	ICommand::Execute_Do(CommandObject);
+	
+	int NextIndex = CurrentIndex + 1;
+
+	// max size check, replace oldest in array
+	if (NextIndex == MaxSize)
 	{
-		int NextIndex = CurrentIndex + 1;
-
-		// max size check, replace oldest in array
-		if (NextIndex == MaxSize)
-		{
-			CommandUtil::DestroyCommand(History[TrueIndex(NextIndex)]); 
-			IndexOffset = TrueIndex(1); 
-			NextIndex = MaxSize - 1;
-		}
-
-		ClearRedoable(); // clear redoable, so history does not branch
-
-		History[TrueIndex(NextIndex)] = Command;
-		LastIndex = CurrentIndex = NextIndex;
+		CommandUtil::DestroyCommand(History[TrueIndex(NextIndex)]); 
+		IndexOffset = TrueIndex(1); 
+		NextIndex = MaxSize - 1;
 	}
+
+	ClearRedoable(); // clear redoable, so history does not branch
+
+	History[TrueIndex(NextIndex)] = Command;
+	LastIndex = CurrentIndex = NextIndex;	
 }
 
 #pragma region UNDO 
@@ -49,7 +48,7 @@ bool UCommandHistoryFixedSize::CanUndo_Implementation()
 
 void UCommandHistoryFixedSize::Undo_Implementation()
 {
-	if (CanUndo())
+	if (CanUndo_Implementation())
 		Undo_Impl();
 }
 
@@ -62,7 +61,7 @@ void UCommandHistoryFixedSize::UndoNum_Implementation(int num)
 
 void UCommandHistoryFixedSize::UndoAll_Implementation()
 {
-	UndoNum(CurrentIndex + 1);
+	UndoNum_Implementation(CurrentIndex + 1);
 }
 
 void UCommandHistoryFixedSize::Undo_Impl()
@@ -83,7 +82,7 @@ bool UCommandHistoryFixedSize::CanRedo_Implementation()
 
 void UCommandHistoryFixedSize::Redo_Implementation()
 {
-	if (CanRedo())
+	if (CanRedo_Implementation())
 		Redo_Impl();
 }
 
@@ -96,7 +95,7 @@ void UCommandHistoryFixedSize::RedoNum_Implementation(int num)
 
 void UCommandHistoryFixedSize::RedoAll_Implementation()
 {
-	RedoNum(LastIndex - CurrentIndex);
+	RedoNum_Implementation(LastIndex - CurrentIndex);
 }
 
 void UCommandHistoryFixedSize::Redo_Impl()

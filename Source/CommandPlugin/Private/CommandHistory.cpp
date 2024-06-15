@@ -16,17 +16,16 @@ void UCommandHistory::Push_Implementation(const TScriptInterface<ICommand>& Comm
 	if (CommandObject == NULL) 
 		return;
 
-	if (ICommand::Execute_Do(CommandObject)) 
-	{
-		if (UndoableHistory.Num() == MaxSize)
-		{
-			CommandUtil::DestroyCommand(UndoableHistory[0]); // when max size, destroy 'oldest'
-			UndoableHistory.RemoveAt(0);
-		}
-		UndoableHistory.Push(Command);
+	ICommand::Execute_Do(CommandObject);
 
-		ClearRedoable(); // no branching history
+	if (UndoableHistory.Num() == MaxSize)
+	{
+		CommandUtil::DestroyCommand(UndoableHistory[0]); // when max size, destroy 'oldest'
+		UndoableHistory.RemoveAt(0);
 	}
+	UndoableHistory.Push(Command);
+
+	ClearRedoable(); // no branching history
 }
 
 #pragma region UNDO 
@@ -38,7 +37,7 @@ bool UCommandHistory::CanUndo_Implementation()
 
 void UCommandHistory::Undo_Implementation()
 {
-	if (CanUndo()) 
+	if (CanUndo_Implementation())
 		UndoLatest();
 }
 
@@ -51,7 +50,15 @@ void UCommandHistory::UndoNum_Implementation(int num)
 
 void UCommandHistory::UndoAll_Implementation()
 {
-	UndoNum(UndoableHistory.Num());
+	if (CanUndo_Implementation())
+	{
+		for (size_t i = UndoableHistory.Num() - 1; i != -1; --i)
+			ICommand::Execute_Undo(UndoableHistory[i].GetObject());
+
+		Algo::Reverse(UndoableHistory);
+		RedoableHistory.Append(UndoableHistory);
+		UndoableHistory.Empty();
+	}
 }
 
 void UCommandHistory::UndoLatest()
@@ -72,7 +79,7 @@ bool UCommandHistory::CanRedo_Implementation()
 
 void UCommandHistory::Redo_Implementation()
 {
-	if (CanRedo()) 
+	if (CanRedo_Implementation())
 		RedoLatest();
 }
 
@@ -81,19 +88,19 @@ void UCommandHistory::RedoNum_Implementation(int num)
 	num = FMath::Clamp(num, 0, RedoableHistory.Num());
 	for (size_t i = 0; i < num; ++i)
 		RedoLatest();
-
 }
 
 void UCommandHistory::RedoAll_Implementation()
 {
-	if (!CanRedo()) return;
+	if (CanRedo_Implementation()) 
+	{
+		for (size_t i = RedoableHistory.Num() - 1; i != -1; --i)
+			ICommand::Execute_Undo(RedoableHistory[i].GetObject());
 
-	for (size_t i = RedoableHistory.Num() - 1; i != -1; --i)
-		ICommand::Execute_Undo(RedoableHistory[i].GetObject());
-
-	Algo::Reverse(RedoableHistory);
-	UndoableHistory.Append(RedoableHistory);
-	RedoableHistory.Empty();
+		Algo::Reverse(RedoableHistory);
+		UndoableHistory.Append(RedoableHistory);
+		RedoableHistory.Empty();
+	}
 }
 
 void UCommandHistory::RedoLatest()

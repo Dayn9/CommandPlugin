@@ -9,9 +9,6 @@
 #include "UObject/Interface.h"
 #include "Command.generated.h"
 
-//TODO: ToString() for debugging
-//TODO: return bool from DO() and UNDO() as 'does change application state?'
-
 UINTERFACE(MinimalAPI, Blueprintable)
 class UCommand : public UInterface
 {
@@ -26,11 +23,11 @@ class COMMANDPLUGIN_API ICommand
 public:
 	/* changes state to new value. Returns true when state is changed */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Command")
-	bool Do();
+	void Do();
 
 	/* restores state to old value. Returns true when state is changed */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Command")
-	bool Undo();
+	void Undo();
 
 	/* get a user display string for this command */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Command")

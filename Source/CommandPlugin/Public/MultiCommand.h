@@ -19,8 +19,8 @@ private:
 	TArray<TScriptInterface<ICommand>> Commands = TArray<TScriptInterface<ICommand>>();
 
 public:
-	bool Do_Implementation() override;
-	bool Undo_Implementation() override;
+	void Do_Implementation() override;
+	void Undo_Implementation() override;
 	FString GetDisplayString_Implementation() override;
 
 	UFUNCTION(BlueprintCallable, Category = "Command | MultiCommand")

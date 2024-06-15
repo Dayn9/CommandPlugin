@@ -7,7 +7,7 @@
 #include "Command.h"
 #include "CommandStack.generated.h"
 
-UINTERFACE(MinimalAPI)
+UINTERFACE(MinimalAPI, Blueprintable)
 class UCommandStack : public UInterface
 {
 	GENERATED_BODY()
