@@ -1,5 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
+// Copyright (c) 2024, Dane Sherman. All rights reserved.
 #include "CommandPluginModule.h"
 
 #define LOCTEXT_NAMESPACE "FCommandPluginModule"

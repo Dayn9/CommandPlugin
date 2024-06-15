@@ -1,3 +1,4 @@
+// Copyright (c) 2024, Dane Sherman. All rights reserved.
 #include "MultiCommand.h"
 #include "CommandUtil.h"
 

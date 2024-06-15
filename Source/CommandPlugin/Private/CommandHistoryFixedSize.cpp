@@ -1,3 +1,4 @@
+// Copyright (c) 2024, Dane Sherman. All rights reserved.
 #include "CommandHistoryFixedSize.h"
 #include <CommandUtil.h>
 

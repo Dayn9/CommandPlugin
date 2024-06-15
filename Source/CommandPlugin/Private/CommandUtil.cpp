@@ -1,12 +1,5 @@
+// Copyright (c) 2024, Dane Sherman. All rights reserved.
 #include "CommandUtil.h"
-
-CommandUtil::CommandUtil()
-{
-}
-
-CommandUtil::~CommandUtil()
-{
-}
 
 void CommandUtil::DestroyCommand(TScriptInterface<ICommand> Command)
 {

@@ -1,3 +1,4 @@
+// Copyright (c) 2024, Dane Sherman. All rights reserved.
 #pragma once
 
 #include "CoreMinimal.h"
@@ -6,8 +7,5 @@
 class CommandUtil
 {
 public:
-	CommandUtil();
-	~CommandUtil();
-
 	static void DestroyCommand(TScriptInterface<ICommand> Command);
 };

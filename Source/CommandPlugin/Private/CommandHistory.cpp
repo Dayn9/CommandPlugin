@@ -1,3 +1,4 @@
+// Copyright (c) 2024, Dane Sherman. All rights reserved.
 #include "CommandHistory.h"
 #include "CommandUtil.h"
 
