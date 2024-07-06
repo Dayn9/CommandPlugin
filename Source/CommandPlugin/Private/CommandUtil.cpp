@@ -10,3 +10,15 @@ void CommandUtil::DestroyCommand(TScriptInterface<ICommand> Command)
 		CommandObject->ConditionalBeginDestroy();
 	}
 }
+
+void CommandUtil::EnableActor(TObjectPtr<AActor> Actor)
+{
+	Actor->SetActorHiddenInGame(false);
+	Actor->SetActorEnableCollision(true);
+}
+
+void CommandUtil::DisableActor(TObjectPtr<AActor> Actor)
+{
+	Actor->SetActorHiddenInGame(true);
+	Actor->SetActorEnableCollision(false);
+}

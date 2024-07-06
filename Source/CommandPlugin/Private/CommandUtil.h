@@ -8,4 +8,8 @@ class CommandUtil
 {
 public:
 	static void DestroyCommand(TScriptInterface<ICommand> Command);
+
+	static void EnableActor(TObjectPtr<AActor> Actor);
+
+	static void DisableActor(TObjectPtr<AActor> Actor);
 };
