@@ -3,7 +3,7 @@
 
 void UDestroyActorCommand::Do_Implementation()
 {
-	if (ActorToDestroy = NULL)
+	if (ActorToDestroy == NULL)
 		return;
 
 	InLimbo = true;
@@ -12,7 +12,7 @@ void UDestroyActorCommand::Do_Implementation()
 
 void UDestroyActorCommand::Undo_Implementation()
 {
-	if (ActorToDestroy = NULL)
+	if (ActorToDestroy == NULL)
 		return;
 
 	InLimbo = false;

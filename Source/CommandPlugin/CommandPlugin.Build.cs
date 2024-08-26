@@ -1,5 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
+// Copyright (c) 2024, Dane Sherman. All rights reserved.
 using UnrealBuildTool;
 
 public class CommandPlugin : ModuleRules
@@ -36,8 +35,6 @@ public class CommandPlugin : ModuleRules
 			{
 				"CoreUObject",
 				"Engine",
-				"Slate",
-				"SlateCore",
 				// ... add private dependencies that you statically link with here ...
 			}
 			);

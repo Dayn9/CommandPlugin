@@ -18,10 +18,10 @@ AActor* USpawnActorCommand::SpawnActor_Implementation()
 
 void USpawnActorCommand::Do_Implementation()
 {
-	if (SpawnedActor = NULL)
+	if (SpawnedActor == NULL)
 		SpawnedActor = SpawnActor();
 	
-	if (SpawnedActor = NULL)
+	if (SpawnedActor == NULL)
 		return;
 
 	InLimbo = false;
@@ -30,7 +30,7 @@ void USpawnActorCommand::Do_Implementation()
 
 void USpawnActorCommand::Undo_Implementation()
 {
-	if (SpawnedActor = NULL)
+	if (SpawnedActor == NULL)
 		return;
 
 	InLimbo = true;
@@ -40,6 +40,11 @@ void USpawnActorCommand::Undo_Implementation()
 FString USpawnActorCommand::GetDisplayString_Implementation()
 {
 	return "Spawned";
+}
+
+const AActor* USpawnActorCommand::GetSpawnedActor()
+{
+	return SpawnedActor;
 }
 
 void USpawnActorCommand::BeginDestroy()

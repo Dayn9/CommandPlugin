@@ -46,6 +46,9 @@ public:
 	void Undo_Implementation() override;
 	FString GetDisplayString_Implementation() override;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	const AActor* GetSpawnedActor();
+
 	virtual void BeginDestroy() override;
 	
 };
