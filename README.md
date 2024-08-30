@@ -1,7 +1,6 @@
 # CommandPlugin
 Command Pattern for implementing undo/redo systems in Unreal Engine. 
 
-
 ### Command Pattern? 
 
 The basic idea behind using the command pattern for undo / redo is to wrap any function that needs to be undoable with a command. 
@@ -12,7 +11,6 @@ For more information on the command pattern see: [refactoring guru - command pat
 
 Note: This Unreal Engine implementation uses "Do" instead of "Execute".
 This change was made to avoid confusion when calling [UINTERFACE](https://docs.unrealengine.com/4.27/en-US/ProgrammingAndScripting/GameplayArchitecture/Interfaces/) functions in C++, which use a generated Execute_ function: ICommand::Execute_Do();
-
 
 ### Guidelines
 
@@ -34,6 +32,7 @@ This message should reflect the new value, which is set by calling `ICommand.Do(
 ### Function -> ICommand
 
 Here is an example of how to turn a function into a command:
+Let's start with an example object `ExampleState` with a function `SetX()` that we want to track in the command history.
 
 ```
 class ExampleState
@@ -46,11 +45,11 @@ public:
 }
 ```
 
-In order to call `SetX()` we will need:
+In order to call `SetX()` from a command we will need:
 1) a reference to the object it's being called on
 2) the float value we want to use
 
-These will be assigned in the costructor (or exposed on spawn in blueprint)
+These will be assigned in the costructor of our command (exposed on spawn in blueprint)
 
 ```
 class ExampleCommand : pubic ICommand
@@ -66,9 +65,11 @@ class ExampleCommand : pubic ICommand
 		OldX = Target->GetX(); // store the old value 
 	}
 
-	void Do_Implementation() override { Target->SetX(NewValue); }
-	void Undo_Implementation() override { Target->SetX(OldValue); }
-	FString GetDisplayString_Implementation() overrid { return "SetX"; } 
+	void Do_Implementation() override { Target->SetX(NewX); }
+	void Undo_Implementation() override { Target->SetX(OldX); }
+	FString GetDisplayString_Implementation() overrid { return "updated X on target"; } 
 }
 ```
+
+Notice that `OldX` does not need to be passed in to the constructor. Since there is already have a reference to the state object, we can simply call `GetX()` to cache the current state. 
 
