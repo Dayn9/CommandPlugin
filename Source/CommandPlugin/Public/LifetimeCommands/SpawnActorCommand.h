@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS(BlueprintType)
+UCLASS(BlueprintType, Blueprintable)
 class COMMANDPLUGIN_API USpawnActorCommand : public UObject, public ICommand
 {
 	GENERATED_BODY()

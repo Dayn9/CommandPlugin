@@ -5,7 +5,7 @@
 #include "Command.h"
 #include "DestroyActorCommand.generated.h"
 
-UCLASS(BlueprintType)
+UCLASS(BlueprintType, Blueprintable)
 class COMMANDPLUGIN_API UDestroyActorCommand : public UObject, public ICommand
 {
 	GENERATED_BODY()
