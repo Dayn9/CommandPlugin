@@ -1,4 +1,4 @@
-// Copyright (c) {Year}, {CompanyName}. All rights reserved.
+// Copyright (c) 2024, Dane Sherman. All rights reserved.
 
 #pragma once
 
