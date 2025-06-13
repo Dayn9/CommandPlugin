@@ -1,7 +1,7 @@
-// Copyright (c) {Year}, {CompanyName}. All rights reserved.
-
+// Copyright (c) 2024, Dane Sherman. All rights reserved.
 
 #include "LifetimeCommands/SpawnActorCommand.h"
+
 #include "CommandUtil.h"
 
 AActor* USpawnActorCommand::SpawnActor_Implementation()
@@ -15,14 +15,22 @@ AActor* USpawnActorCommand::SpawnActor_Implementation()
 	return GetWorld()->SpawnActor(ActorClass.Get(), &SpawnTransform, SpawnParams);
 }
 
+const AActor* USpawnActorCommand::GetSpawnedActor()
+{
+	return SpawnedActor;
+}
 
 void USpawnActorCommand::Do_Implementation()
 {
-	if (SpawnedActor == NULL)
+	if (SpawnedActor == NULL) 
+	{
 		SpawnedActor = SpawnActor();
+	}
 	
-	if (SpawnedActor == NULL)
+	if (SpawnedActor == NULL) 
+	{
 		return;
+	}
 
 	InLimbo = false;
 	CommandUtil::EnableActor(SpawnedActor);
@@ -30,8 +38,10 @@ void USpawnActorCommand::Do_Implementation()
 
 void USpawnActorCommand::Undo_Implementation()
 {
-	if (SpawnedActor == NULL)
+	if (SpawnedActor == NULL) 
+	{
 		return;
+	}
 
 	InLimbo = true;
 	CommandUtil::DisableActor(SpawnedActor);
@@ -42,16 +52,12 @@ FString USpawnActorCommand::GetDisplayString_Implementation()
 	return "Spawned";
 }
 
-const AActor* USpawnActorCommand::GetSpawnedActor()
-{
-	return SpawnedActor;
-}
-
 void USpawnActorCommand::BeginDestroy()
 {
 	if (InLimbo && SpawnedActor != NULL)
 	{
 		SpawnedActor->Destroy();
 	}
+
 	Super::BeginDestroy();
 }

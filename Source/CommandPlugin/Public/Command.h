@@ -3,6 +3,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+
 #include "Command.generated.h"
 
 UINTERFACE(MinimalAPI, Blueprintable)
@@ -17,6 +18,7 @@ class COMMANDPLUGIN_API ICommand
 	GENERATED_BODY()
 
 public:
+
 	/* changes state to new value. */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Command")
 	void Do();

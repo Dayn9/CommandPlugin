@@ -1,10 +1,11 @@
 // Copyright (c) 2024, Dane Sherman. All rights reserved.
 #pragma once
 
-#include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "Command.h"
 #include "CommandStack.h"
+#include "CoreMinimal.h"
+#include "UObject/NoExportTypes.h"
+
 #include "CommandHistoryFixedSize.generated.h"
 
 /*
@@ -38,6 +39,7 @@ class COMMANDPLUGIN_API UCommandHistoryFixedSize : public UObject, public IComma
 	*/
 
 public: 
+
 	UCommandHistoryFixedSize();
 
 	UPROPERTY(BlueprintReadWrite, meta = (ExposeOnSpawn = true))
@@ -70,14 +72,23 @@ public:
 #pragma endregion
 
 private:
-	int CurrentIndex = -1; // Index of the latest done command
-	int LastIndex = -1; // Index of the latest command (CurrentIndex + the number of undone commands) 
-	int IndexOffset = 0; // array index wrapping offset
+
+	/* Index of the latest done command */
+	int CurrentIndex = -1;
+
+	/* Index of the latest command (CurrentIndex + the number of undone commands) */
+	int LastIndex = -1; 
+
+	/* array index wrapping offset */
+	int IndexOffset = 0; 
 
 	TArray<TScriptInterface<ICommand>> History = TArray<TScriptInterface<ICommand>>();
 
 	/* Convert from History Index, to Array Index */
-	inline int TrueIndex(int Index) { return (Index + IndexOffset) % MaxSize; }
+	inline int TrueIndex(int Index) 
+	{ 
+		return (Index + IndexOffset) % MaxSize; 
+	}
 
 	/* Unvalidated logic for performing undo*/
 	void Undo_Impl();

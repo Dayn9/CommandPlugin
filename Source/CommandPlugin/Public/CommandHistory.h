@@ -1,10 +1,11 @@
 // Copyright (c) 2024, Dane Sherman. All rights reserved.
 #pragma once
 
-#include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "Command.h"
 #include "CommandStack.h"
+#include "CoreMinimal.h"
+#include "UObject/NoExportTypes.h"
+
 #include "CommandHistory.generated.h"
 
 /*
