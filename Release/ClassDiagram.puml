@@ -1,0 +1,68 @@
+@startuml
+' Set layout top-down so inheritance flows vertically
+skinparam linetype ortho
+
+' Force top-down layout
+left to right direction
+
+interface ICommand {
+    +void Do()
+    +void Undo()
+    +FString GetDisplayString()
+}
+
+' Group ICommand implementers below ICommand for visual clarity
+package "ICommand Implementations" {
+    class UMultiCommand {
+        -List<ICommand> Commands
+        +void Add(ICommand AddCommand)
+        +void Append(List<ICommand> AddCommands)
+    }
+
+    class UDestroyActorCommand {
+        +AActor* ActorToDestroy
+    }
+
+    class USpawnActorCommand {
+        -AActor* SpawnedActor
+        #AActor SpawnActor()
+        +const AActor* GetSpawnedActor()
+    }
+}
+
+interface ICommandStack {
+    +int GetMaxSize()
+    +void Push(ICommand Command)
+    +bool CanUndo()
+    +void Undo()
+    +void UndoNum(int num)
+    +void UndoAll()
+    +bool CanRedo()
+    +void Redo()
+    +void RedoNum(int num)
+    +void RedoAll()
+    +void Clear()
+}
+
+class UCommandHistory {
+    -List<ICommand> UndoableHistory
+    -List<ICommand> RedoableHistory
+    +int MaxSize
+}
+
+class UCommandHistoryFixedSize {
+    -List<ICommand> History
+    +int MaxSize
+}
+
+' Relationships
+UMultiCommand ..|> ICommand
+UDestroyActorCommand ..|> ICommand
+USpawnActorCommand ..|> ICommand
+
+UCommandHistory ..|> ICommandStack
+UCommandHistoryFixedSize ..|> ICommandStack
+
+ICommandStack --> ICommand 
+
+@enduml
