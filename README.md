@@ -29,6 +29,22 @@ Similarly, `ICommand.Undo()` should only ever be called in the `ICommandStack.Un
 4) `ICommand.GetDisplayString()` is **not required** but if used, should reflect the new value set by executing the command. return a user-friendly message. 
 This message should reflect the new value, which is set by calling `ICommand.Do()`
 
+### Blueprint Examples
+
+##### Editor Utility Widget Example
+
+> Open **EW_StateExampleController** to view an example of setting up the command history and state inside an [editor utility widget](https://dev.epicgames.com/documentation/en-us/unreal-engine/editor-utility-widgets-in-unreal-engine). This widget outlines the intended approach when using the command interface. A command history object is created in CreateCommandHistory() and then controlled through this object. Updates to the UI are then tracked using OnTextCommitted that will read the new value and track the change in the command history. Controls are also provided for seeing the Undo Redo commands in action.  
+
+![Example](\Release\Example.png)
+
+![Example2](\Release\Example2.png)
+
+##### Actors in Level example
+
+> Open and run **Lvl_SpawnExample** to view an example of setting up Actor commands. The command history is set up here with a max size of 3 to demonstrate the concept of actors being in *Libmo* when "destroyed" but still referenced in the command history.
+
+![Limbo](\Release\Limbo.png)
+
 ### Function -> ICommand
 
 Here is an example of how to turn a function into a command:
@@ -37,11 +53,17 @@ Let's start with an example object `ExampleState` with a variable `X` that we wa
 ```
 class ExampleState
 {
-private: 
 	float X;
-public: 
-	float GetX() { return X; }
-	void SetX(float NewX) { X = NewX; }
+
+	float GetX() 
+	{ 
+		return X; 
+	}
+
+	void SetX(float NewX) 
+	{ 
+		X = NewX; 
+	}
 }
 ```
 
