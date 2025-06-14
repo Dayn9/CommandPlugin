@@ -47,7 +47,7 @@ public:
 
 To track changes to `X` in a command, we will need:
 1) a reference to the object it's being called on
-3) the new value 
+2) the new value 
 
 These will be assigned in the constructor of our command (this would be exposed on spawn in blueprint)
 
