@@ -35,15 +35,15 @@ This message should reflect the new value, which is set by calling `ICommand.Do(
 
 > Open **EW_StateExampleController** to view an example of setting up the command history and state inside an [editor utility widget](https://dev.epicgames.com/documentation/en-us/unreal-engine/editor-utility-widgets-in-unreal-engine). This widget outlines the intended approach when using the command interface. A command history object is created in CreateCommandHistory() and then controlled through this object. Updates to the UI are then tracked using OnTextCommitted that will read the new value and track the change in the command history. Controls are also provided for seeing the Undo Redo commands in action.  
 
-![Example](\Release\Example.png)
+![Example](/Release/Example.png)
 
-![Example2](\Release\Example2.png)
+![Example2](/Release/Example2.png)
 
 ##### Actors in Level example
 
 > Open and run **Lvl_SpawnExample** to view an example of setting up Actor commands. The command history is set up here with a max size of 3 to demonstrate the concept of actors being in *Libmo* when "destroyed" but still referenced in the command history.
 
-![Limbo](\Release\Limbo.png)
+![Limbo](/Release/Limbo.png)
 
 ### Function -> ICommand
 
